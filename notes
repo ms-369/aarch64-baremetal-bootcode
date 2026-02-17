@@ -1,0 +1,16 @@
+-> Installing qemu:
+	sudo apt install qemu-system-arm gcc-aarch64-linux-gnu gdb-multiarch -y
+-> Initiallising Git:
+	git init
+-> Creating deirectory structure:
+	src/main.c, boot.S, vector_table.S
+	include/boot.h
+	Makefile, linker.ld, build/
+->Writing vector_table_el3 in vector_table.S
+	 will write for rest el's when needed but
+		first we need to write for current el which we are using
+-> Initialising registers:
+	initializing all gpr's with xzr
+	assiging sp value
+	assigning vbar_el's with exception vector table base addresses
+
