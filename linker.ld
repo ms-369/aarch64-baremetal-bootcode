@@ -15,6 +15,8 @@ SECTIONS
             *(.data)
         } > RAM
 
+	/* Alignment for 4KB  */
+	. = ALIGN(4096)
 	.bss : {
             *(.bss)
         } > RAM

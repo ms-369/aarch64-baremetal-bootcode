@@ -67,18 +67,24 @@ steup_mair:
 	2. Prepare the Descriptor value
 	3. Store the descriptor in the first slot of the table
     ------------------------------------------------------------ */
-	ldr x0, =page_table_l2
+	/* Setting up level 1 table  */
+	ldr x0, =page_table_l1
+	ldr x1, =page_table_l2
+
+	orr x2, x1, #0x3
+	
+	str x2, [x0, #0]
+	str x2, [x0, #8]
+
 	/* Rule for UART at slot 72  */
-	ldr x1, =0x9000401
-	mov x2, #72
-	/* Store at Base + (72 * 8)  */
-	str x1, [x0, x2, lsl #3]
+	ldr x2, =0x9000401
+	/* Store in L2 at Index 72  */
+	str x2, [x2, #72 * 8]
 
 	/* RAM at slot 512  */
-        ldr x1, =0x40000705
-        mov x2, #512
-        /* Store at Base + (512 * 8)  */
-        str x1, [x0, x2, lsl #3]
+        ldr x2, =0x40000705
+        /* Store in L2 at Index 0 */
+        str x2, [x1, #0]
 
 
 setup_tcr:
@@ -90,7 +96,7 @@ setup_tcr:
 
 enable_mmu:
 	/* Point to page_table_l2  */
-	ldr x0, =page_table_l2
+	ldr x0, =page_table_l1
 	msr TTBR0_EL3, x0
 	isb
 	
@@ -115,5 +121,7 @@ hang:
 .section .bss
 .align 12
 page_table_l2:
-.space 8192
+	.space 4096
+page_table_l2:
+	.space 4096
 
