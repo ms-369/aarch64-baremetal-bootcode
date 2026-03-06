@@ -13,4 +13,58 @@
 	initializing all gpr's with xzr
 	assiging sp value
 	assigning vbar_el's with exception vector table base addresses
+-> Setting up MAIR(memory attribute indirection register)
+	The MAIR_EL3 regiter basially helps us in configuring the type of memory. There are 8 types of memory that arm provides, each of 8 slots has 8 bits(4 outer attr, 4 inner attr). 
+	Bit Range,Index,Purpose (Common Usage)
+	[7:0],Attr 0,"Device Memory (UART, Interrupt Controller)"
+	[15:8],Attr 1,"Normal Memory (RAM, Caches enabled)"
+	[23:16],Attr 2,Non-Cacheable RAM (DMA buffers)
+	[31:24],Attr 3,"Tagged Memory (MTE) or extra ""flavors"""
+	[63:56],Attr 7,(Usually left empty/default)
+	MORE EXPLAINATION:
+		Recipe for RAM (Normal Memory): 0xFF
+
+    Binary: 1111 1111
+
+    Meaning: This tells the CPU: "This is Normal Memory. You are allowed to cache it, reorder reads/writes for speed, and use Write-Back caching."
+
+    Why? This is what makes your code run fast.
+
+Recipe for Hardware (Device Memory): 0x00
+
+    Binary: 0000 0000
+
+    Meaning: This is called Device-nGnRnE.
+
+        nG (no Gathering): Don't combine multiple writes into one.
+
+        nR (no Reordering): Execute instructions exactly in the order I wrote them.
+
+        nE (no Early-Ack): Don't tell the CPU a write is "done" until it actually hits the hardware.
+
+    Why? If you are writing to a UART (serial port), the order matters perfectly. If the CPU "optimizes" or "caches" a UART write, your text might never appear on the screen!
+
+	-----> Now, think about your Page Table Descriptor. It is also a 64-bit value. Inside that descriptor, there is a tiny 3-bit field called AttrIndx[2:0].
+
+	       If you put 000 in those bits, the MMU uses the rules in Attr 0 (Device).
+
+	       If you put 001 in those bits, the MMU uses the rules in Attr 1 (Normal RAM)
+
+
+-> Configuring a chunk of RAM as cache:
+	following is the block/ chunk descriptor:
+	Bit(s),Value,Name,Description
+[0],1,Valid,Tells the MMU this entry is active.
+[1],0,Type,"For Level 2, 0 means this is a ""Block"" (2MB)."
+[4:2],001,AttrIndx,Points to Index 1 in your MAIR (RAM recipe).
+[10],1,AF,"Access Flag. If 0, the CPU crashes the first time you touch memory."
+[47:21],0x200,Address,The physical address bits for 0x40000000.
+
+-> Configuring the TCR (translation control register)
+	+++++++ > read more!!!!!! 
+
+
+
+
+
 

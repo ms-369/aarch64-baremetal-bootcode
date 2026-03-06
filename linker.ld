@@ -1,13 +1,14 @@
 MEMORY
 {
-	RAM(rwx) : ORIGIN = 0x40000000, LENGTH = 128M
+	RAM(rwx) : ORIGIN = 0x40100000, LENGTH = 127M
 }
 
 SECTIONS
 {
-	. = ORIGIN(RAM);
+	. = 0x40100000;
 	
 	.text : {
+	    *(.text.boot)
 	    *(.text)
 	} > RAM
 
@@ -16,7 +17,7 @@ SECTIONS
         } > RAM
 
 	/* Alignment for 4KB  */
-	. = ALIGN(4096)
+	. = ALIGN(4096);
 	.bss : {
             *(.bss)
         } > RAM
